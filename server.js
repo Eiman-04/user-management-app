@@ -1,10 +1,13 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
+
 const app = express();
 const port = 3000;
 
 // Middleware pour traiter les données JSON
 app.use(express.json());
+const cors = require('cors');
+app.use(cors());
 
 // Créer ou ouvrir une base de données SQLite
 const db = new sqlite3.Database('./users.db', (err) => {
@@ -20,6 +23,7 @@ const db = new sqlite3.Database('./users.db', (err) => {
       email TEXT UNIQUE NOT NULL,
       password TEXT NOT NULL
     )`);
+    
   }
 });
 
