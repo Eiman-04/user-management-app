@@ -13,7 +13,7 @@ const db = new sqlite3.Database('./users.db', (err) => {
   } else {
     console.log('Connecté à la base de données SQLite.');
 
-    // Créer une table 'users' si elle n'existe pas
+    // Créer une table 
     db.run(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
   res.send('Hello from Express with SQLite!');
 });
 
-// a) Create (Ajouter un utilisateur)
+// Ajouter un utilisateur
 app.post('/users', (req, res) => {
   const { name, email, password } = req.body;
 
@@ -54,10 +54,10 @@ app.post('/users', (req, res) => {
 });
 
 
-// b) Read (Récupérer tous les utilisateurs)
+// Récupérer tous les utilisateurs
 app.get('/users', (req, res) => {
-  const query = 'SELECT * FROM users';
-  db.all(query, [], (err, rows) => {
+  const sql = 'SELECT * FROM users';
+  db.all(sql, [], (err, rows) => {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la récupération des utilisateurs' });
     }
@@ -65,10 +65,11 @@ app.get('/users', (req, res) => {
   });
 });
 
-// c) Read (Récupérer un utilisateur par ID)
+//Récupérer un utilisateur par ID
 app.get('/users/:id', (req, res) => {
-  const query = 'SELECT * FROM users WHERE id = ?';
-  db.get(query, [req.params.id], (err, row) => {
+  const { id } = req.params;
+  const sql = 'SELECT * FROM users WHERE id = ?';
+  db.get(sql, [id], (err, row) => {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la récupération de l\'utilisateur' });
     }
@@ -79,17 +80,18 @@ app.get('/users/:id', (req, res) => {
   });
 });
 
-// d) Update (Mettre à jour un utilisateur par ID)
+
+// Mettre à jour un utilisateur par ID
 app.put('/users/:id', (req, res) => {
+  const { id } = req.params;
   const { name, email, password } = req.body;
 
-  // Validation des champs requis
   if (!name || !email || !password) {
     return res.status(400).json({ error: 'Tous les champs sont requis' });
   }
 
-  const query = 'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?';
-  db.run(query, [name, email, password, req.params.id], function (err) {
+  const sql = 'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?';
+  db.run(sql, [name, email, password, id], function (err) {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la mise à jour de l\'utilisateur' });
     }
@@ -100,10 +102,12 @@ app.put('/users/:id', (req, res) => {
   });
 });
 
-// e) Delete (Supprimer un utilisateur par ID)
+
+// Supprimer un utilisateur par ID
 app.delete('/users/:id', (req, res) => {
-  const query = 'DELETE FROM users WHERE id = ?';
-  db.run(query, [req.params.id], function (err) {
+  const { id } = req.params;
+  const sql = 'DELETE FROM users WHERE id = ?';
+  db.run(sql, [id], function (err) {
     if (err) {
       return res.status(500).json({ error: 'Erreur lors de la suppression de l\'utilisateur' });
     }
@@ -113,6 +117,7 @@ app.delete('/users/:id', (req, res) => {
     res.json({ message: 'Utilisateur supprimé avec succès' });
   });
 });
+
 
 // Lancer le serveur
 app.listen(port, () => {
